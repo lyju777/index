@@ -1,7 +1,6 @@
-@import "./reset.scss";
+@use "./reset.scss";
 
 body {
-  max-width: 1500px;
   margin: 0 auto;
-  padding: 0 16px;
+  background-color: #f0f0f0;
 }

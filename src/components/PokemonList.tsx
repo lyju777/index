@@ -6,11 +6,17 @@ import {
   CardContent,
   Typography,
   Container,
+  Button,
 } from "@mui/material";
 
-import { fetchPokemonList, fetchPokemonDetails } from "@/api/pokemonService";
+import {
+  fetchPokemonList,
+  fetchPokemonDetails,
+  fetchPokemonSpecies,
+} from "@/api/pokemonService";
 import { PokemonDetails } from "@/types/types";
 import "@/components/styles/PokemonList.scss";
+import { translatePokemonType } from "@/locales/pokemonTypes";
 
 const PokemonList = () => {
   const [pokemonList, setPokemonList] = useState<PokemonDetails[]>([]);
@@ -23,7 +29,24 @@ const PokemonList = () => {
         const details = await Promise.all(
           list.data.results.map((pokemon) => fetchPokemonDetails(pokemon.name))
         );
-        setPokemonList(details);
+
+        const species = await Promise.all(
+          list.data.results.map((pokemon) => fetchPokemonSpecies(pokemon.name))
+        );
+
+        const findKoName = await species.map((species) =>
+          species.data.names.find((name) => name.language.name === "ko")
+        );
+
+        setPokemonList(
+          details.map((pokemon, index) => ({
+            ...pokemon.data,
+            language_ko: {
+              name: findKoName[index]?.name || pokemon.data.name,
+            },
+          }))
+        );
+
         setLoading(false);
       } catch (error) {
         console.error("Error fetching pokemon:", error);
@@ -42,7 +65,7 @@ const PokemonList = () => {
     <Container className="pokemon-list">
       <Grid container spacing={3}>
         {pokemonList.map((pokemon) => (
-          <Grid item xs={12} sm={6} md={4} lg={3} key={pokemon.data.id}>
+          <Grid item xs={12} sm={6} md={4} lg={3} key={pokemon.id}>
             <Card>
               <CardMedia
                 className="pokemon-list__card-image"
@@ -53,18 +76,30 @@ const PokemonList = () => {
                   objectFit: "none",
                 }}
                 image={
-                  pokemon.data.sprites.versions["generation-v"]["black-white"]
+                  pokemon.sprites.versions["generation-v"]["black-white"]
                     .animated.front_default
                 }
-                alt={pokemon.data.name}
+                alt={pokemon.language_ko.name}
               />
               <CardContent>
                 <Typography variant="h6" sx={{ textTransform: "capitalize" }}>
-                  {pokemon.data.name}
+                  {pokemon.language_ko.name}
                 </Typography>
                 <Typography variant="body2">
-                  타입:{" "}
-                  {pokemon.data.types.map((type) => type.type.name).join(", ")}
+                  {pokemon.types.map((type) => (
+                    <Button
+                      sx={{
+                        backgroundColor: "#000",
+                        color: "#fff",
+                        marginRight: 1,
+                      }}
+                      variant="contained"
+                      key={type.type.name}
+                      size="small"
+                    >
+                      {translatePokemonType(type.type.name)}
+                    </Button>
+                  ))}
                 </Typography>
               </CardContent>
             </Card>

@@ -9,3 +9,7 @@ export function fetchPokemonList(limit = 151, offset = 0) {
 export function fetchPokemonDetails(nameOrId: string | number) {
   return requestAxios.get(`/pokemon/${nameOrId}`);
 }
+
+export function fetchPokemonSpecies(nameOrId: string | number) {
+  return requestAxios.get(`/pokemon-species/${nameOrId}`);
+}

@@ -6,7 +6,6 @@ import {
   CardContent,
   Typography,
   Container,
-  Button,
 } from "@mui/material";
 
 import {
@@ -17,6 +16,7 @@ import {
 import { PokemonDetails } from "@/types/types";
 import "@/components/styles/PokemonList.scss";
 import { translatePokemonType } from "@/locales/pokemonTypes";
+import { PokemonTypeButton } from "@/components/styles/common/CustomStyles";
 
 const PokemonList = () => {
   const [pokemonList, setPokemonList] = useState<PokemonDetails[]>([]);
@@ -87,18 +87,14 @@ const PokemonList = () => {
                 </Typography>
                 <Typography variant="body2">
                   {pokemon.types.map((type) => (
-                    <Button
-                      sx={{
-                        backgroundColor: "#000",
-                        color: "#fff",
-                        marginRight: 1,
-                      }}
+                    <PokemonTypeButton
+                      bgColor={translatePokemonType(type.type.name).color}
                       variant="contained"
                       key={type.type.name}
                       size="small"
                     >
-                      {translatePokemonType(type.type.name)}
-                    </Button>
+                      {translatePokemonType(type.type.name).translation}
+                    </PokemonTypeButton>
                   ))}
                 </Typography>
               </CardContent>
